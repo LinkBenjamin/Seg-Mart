@@ -8,15 +8,15 @@
     ],
     "fileStates": {
         "GroundTiles.tsx": {
-            "scaleInDock": 1,
+            "scaleInDock": 0.75,
             "scaleInEditor": 1
         },
         "Map.tmx": {
-            "scale": 0.25,
+            "scale": 0.29885416666666664,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 1964,
-                "y": 1126
+                "x": 680.9341233879401,
+                "y": 962.0076681770652
             }
         }
     },
@@ -32,8 +32,8 @@
     ],
     "project": "TiledProject.tiled-project",
     "recentFiles": [
-        "Map.tmx",
-        "GroundTiles.tsx"
+        "GroundTiles.tsx",
+        "Map.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
