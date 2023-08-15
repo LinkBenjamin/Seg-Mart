@@ -1,4 +1,5 @@
 import pygame
+from pytmx.util_pygame import load_pygame
 
 from config.tempMap import WORLD_MAP
 from config.files import get_full_path
@@ -19,13 +20,21 @@ class World:
         self.create_map()
 
     def create_map(self):
-        # for row_index, row in enumerate(WORLD_MAP):
-        #     for col_index, col in enumerate(row):
-        #         x = col_index * TILESIZE
-        #         y = row_index * TILESIZE
-        #         if col == 'x':
-        #             Tile((x,y),[self.visible_sprites, self.obstacle_sprites])
-        #         elif col == 'p':
+        tmx_data = load_pygame(get_full_path("static", "Map.tmx"))
+        layouts = {
+            'boundary': tmx_data.get_layer_by_name('Barriers'),
+            'objects': tmx_data.get_layer_by_name('Objects'),
+            'interactables': tmx_data.get_layer_by_name('Interactables')
+        }
+
+        # Build a series of invisible obstacle tiles based on the boundary layer - handles all the walls
+        for x,y,s in layouts['boundary']:
+            if(s != 0):
+                Tile((x * TILESIZE,y * TILESIZE),[self.obstacle_sprites],"barrier")
+
+        for x,y,image in layouts['objects'].tiles():
+            if(image != None):
+                Tile((x*TILESIZE, y*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
         self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites)
 
     def run(self):
