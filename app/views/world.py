@@ -44,8 +44,10 @@ class World:
 
         # Build the objects that appear in the game.
         for x,y,image in layouts['objects'].tiles():
+            print("x: " + str(x) + ", y: " + str(y) + ", image: " + str(image))
             if(image != None):
                 Tile((x*TILESIZE, y*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
+
         self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites, self.zones)
 
     def loadidentity(self,identity):

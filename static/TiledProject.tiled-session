@@ -20,8 +20,10 @@
             }
         }
     },
+    "last.exportedFilePath": "/Users/ben/Documents/Seg-Mart/static",
     "last.imagePath": "/Users/ben/Documents/Seg-Mart/static",
     "map.height": 30,
+    "map.lastUsedExportFilter": "CSV files (*.csv)",
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 64,
     "map.tileWidth": 64,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="64" tileheight="64" infinite="0" nextlayerid="6" nextobjectid="13">
  <tileset firstgid="1" source="GroundTiles.tsx"/>
- <layer id="1" name="Ground" width="30" height="30" visible="0">
+ <layer id="1" name="Ground" width="30" height="30">
   <data encoding="csv">
 5,5,5,5,5,10,5,5,5,5,5,5,4,4,4,4,5,5,4,4,4,4,5,4,5,4,4,5,5,5,
 7,8,8,9,5,10,5,7,8,8,9,7,8,8,8,8,8,8,9,5,5,7,8,8,8,8,8,8,9,5,
@@ -35,7 +35,7 @@
 2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2
 </data>
  </layer>
- <layer id="2" name="Barriers" width="30" height="30" visible="0">
+ <layer id="2" name="Barriers" width="30" height="30">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 11,11,11,11,0,0,0,11,11,11,11,11,11,11,11,11,11,11,11,0,0,11,11,11,11,11,11,11,11,0,
@@ -137,7 +137,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="5" name="Zones" visible="0">
+ <objectgroup id="5" name="Zones">
   <object id="3" name="snacks" x="76.9606" y="398.188" width="535.378" height="786.337">
    <properties>
     <property name="zone" value="snacks"/>
