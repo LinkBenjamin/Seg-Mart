@@ -1,7 +1,7 @@
 import pygame, sys
 
 from config.constants import *
-#from app.views.title_screen import TitleScreen
+from app.views.title_screen import TitleScreen
 from app.views.world import World
 
 class Game:
@@ -9,27 +9,33 @@ class Game:
 
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.gamestate = "RUNNING"
+        self.gamestate = "TITLE_SCREEN"
         pygame.display.set_caption(GAME_NAME + " " + GAME_VERSION)
         self.clock = pygame.time.Clock()
- #       self.titlescreen = TitleScreen(self.screen)
+        self.titlescreen = TitleScreen(self.screen)
         self.world = World()
+        self.identity = ""
 
     def run(self):
         while True:
             if self.gamestate == "TITLE_SCREEN":
                 self.gamestate = self.titlescreen.handle_events()
                 self.titlescreen.render()
-            elif self.gamestate == "RUNNING":
+            elif self.gamestate == "WORLD":
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                
+                        self.gamestate = "QUIT"                
                 self.screen.fill('black')
                 self.world.run()
                 pygame.display.update()
                 self.clock.tick(FPS)
+            elif self.gamestate == "QUIT":
+                pygame.quit()
+                sys.exit()
+            else:
+                # RetVal could also hold the user's email
+                self.identity = self.gamestate
+                self.gamestate = "WORLD"
 
 if __name__ == '__main__':
     game = Game()
