@@ -16,6 +16,7 @@ class World:
         # Create sprite groups
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
+        self.zones = pygame.sprite.Group()
 
         self.create_map()
 
@@ -24,18 +25,24 @@ class World:
         layouts = {
             'boundary': tmx_data.get_layer_by_name('Barriers'),
             'objects': tmx_data.get_layer_by_name('Objects'),
-            'interactables': tmx_data.get_layer_by_name('Interactables')
+            'interactables': tmx_data.get_layer_by_name('Interactables'),
+            'zones': tmx_data.get_layer_by_name('Zones')
         }
+
+        # Map the zones (departments of the store)
+        for obj in layouts['zones']:
+            Tile((obj.x, obj.y), [self.zones], obj.name, pygame.Surface((obj.width, obj.height)))
 
         # Build a series of invisible obstacle tiles based on the boundary layer - handles all the walls
         for x,y,s in layouts['boundary']:
             if(s != 0):
                 Tile((x * TILESIZE,y * TILESIZE),[self.obstacle_sprites],"barrier")
 
+        # Build the objects that appear in the game.
         for x,y,image in layouts['objects'].tiles():
             if(image != None):
                 Tile((x*TILESIZE, y*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
-        self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites)
+        self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites, self.zones)
 
     def run(self):
         #Update and draw

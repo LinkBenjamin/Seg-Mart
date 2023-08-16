@@ -3,10 +3,12 @@ from app.utils.imports import import_folder
 from config.files import get_full_path
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, position, groups, obstacle_sprites):
+    def __init__(self, position, groups, obstacle_sprites, zones):
         super().__init__(groups)
         self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff_1.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft=position)
+
+        self.current_zone = "none"
         
         # Animation Setup
         self.import_player_assets()
@@ -18,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
 
         self.obstacle_sprites = obstacle_sprites
+        self.zones = zones
 
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0:
@@ -64,6 +67,13 @@ class Player(pygame.sprite.Sprite):
         self.collision('horizontal')
         self.rect.y += self.direction.y * speed
         self.collision('vertical')
+        self.touch()
+
+    def touch(self):
+        for sprite in self.zones:
+            print("Comparing " + sprite.sprite_type + " to " + self.current_zone)
+            if sprite.rect.colliderect(self.rect):
+                self.current_zone = sprite.sprite_type
 
     def collision(self, direction):
         if direction == 'horizontal':
