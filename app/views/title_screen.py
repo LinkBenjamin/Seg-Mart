@@ -1,9 +1,12 @@
 import pygame
 import pygame_gui
+import config.globalvars
+
 from pygame.rect import Rect
 from pygame_gui.elements.ui_text_entry_line import UITextEntryLine
 from config.files import get_full_path
 from config.constants import *
+
 
 class TitleScreen:
     def __init__(self, screen):
@@ -25,7 +28,9 @@ class TitleScreen:
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
                     if event.ui_element == self.text_input:
-                        retval = event.text
+                        config.globalvars.identity = event.text 
+                        # TODO: Segment identify()
+                        retval = "WORLD"
             self.manager.process_events(event)
         self.manager.update(time_delta)
 

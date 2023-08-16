@@ -14,7 +14,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.titlescreen = TitleScreen(self.screen)
         self.world = World()
-        self.identity = ""
 
     def run(self):
         while True:
@@ -32,10 +31,6 @@ class Game:
             elif self.gamestate == "QUIT":
                 pygame.quit()
                 sys.exit()
-            else:
-                # RetVal could also hold the user's email
-                self.identity = self.gamestate
-                self.gamestate = "WORLD"
 
 if __name__ == '__main__':
     game = Game()

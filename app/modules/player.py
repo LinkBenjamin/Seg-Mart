@@ -1,4 +1,5 @@
 import sys, pygame
+import config.globalvars
 from app.utils.imports import import_folder
 from config.files import get_full_path
 
@@ -8,8 +9,6 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff_1.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft=position)
 
-        self.current_zone = "none"
-        
         # Animation Setup
         self.import_player_assets()
         self.status = 'down_idle'
@@ -71,9 +70,11 @@ class Player(pygame.sprite.Sprite):
 
     def touch(self):
         for sprite in self.zones:
-            print("Comparing " + sprite.sprite_type + " to " + self.current_zone)
             if sprite.rect.colliderect(self.rect):
-                self.current_zone = sprite.sprite_type
+                config.globalvars.currentzone = sprite.sprite_type
+                break
+        if sprite.sprite_type not in config.globalvars.currentzone:
+            config.globalvars.currentzone = ' '
 
     def collision(self, direction):
         if direction == 'horizontal':

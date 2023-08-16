@@ -6,6 +6,7 @@ from config.files import get_full_path
 from config.constants import *
 from app.modules.tile import Tile
 from app.modules.player import Player
+from app.modules.ui import UI
 
 class World:
     def __init__(self):
@@ -19,6 +20,9 @@ class World:
         self.zones = pygame.sprite.Group()
 
         self.create_map()
+
+        # UI
+        self.ui = UI()
 
     def create_map(self):
         tmx_data = load_pygame(get_full_path("static", "Map.tmx"))
@@ -44,10 +48,14 @@ class World:
                 Tile((x*TILESIZE, y*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
         self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites, self.zones)
 
+    def loadidentity(self,identity):
+        self.identity = identity
+
     def run(self):
         #Update and draw
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
+        self.ui.display(self.player)
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
