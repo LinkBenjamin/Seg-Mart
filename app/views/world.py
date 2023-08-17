@@ -1,5 +1,6 @@
 import pygame
 from pytmx.util_pygame import load_pygame
+from app.utils.imports import import_csv_layout
 
 from config.tempMap import WORLD_MAP
 from config.files import get_full_path
@@ -28,9 +29,11 @@ class World:
         tmx_data = load_pygame(get_full_path("static", "Map.tmx"))
         layouts = {
             'boundary': tmx_data.get_layer_by_name('Barriers'),
-            'objects': tmx_data.get_layer_by_name('Objects'),
-            'interactables': tmx_data.get_layer_by_name('Interactables'),
             'zones': tmx_data.get_layer_by_name('Zones')
+        }
+        csvlayouts = {
+            'objects': import_csv_layout(get_full_path("static", "Map_Objects.csv")),
+            'interactables': import_csv_layout(get_full_path("static","Map_Interactables.csv"))
         }
 
         # Map the zones (departments of the store)
@@ -43,12 +46,14 @@ class World:
                 Tile((x * TILESIZE,y * TILESIZE),[self.obstacle_sprites],"barrier")
 
         # Build the objects that appear in the game.
-        for x,y,image in layouts['objects'].tiles():
-            print("x: " + str(x) + ", y: " + str(y) + ", image: " + str(image))
-            if(image != None):
-                Tile((x*TILESIZE, y*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
+        for style, layout in csvlayouts.items():
+                for row_index, row in enumerate(layout):
+                    for col_index, col in enumerate(row):
+                        if int(col) > 0:
+                            image = pygame.image.load(get_full_path("static", "objects", col + ".png"))
+                            Tile((col_index*TILESIZE, row_index*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
 
-        self.player = Player((380,200), [self.visible_sprites], self.obstacle_sprites, self.zones)
+        self.player = Player((320,200), [self.visible_sprites], self.obstacle_sprites, self.zones)
 
     def loadidentity(self,identity):
         self.identity = identity

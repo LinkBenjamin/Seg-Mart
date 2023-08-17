@@ -6,6 +6,7 @@ from pygame.rect import Rect
 from pygame_gui.elements.ui_text_entry_line import UITextEntryLine
 from config.files import get_full_path
 from config.constants import *
+from app.utils.validation import is_valid_email
 
 
 class TitleScreen:
@@ -28,9 +29,10 @@ class TitleScreen:
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
                     if event.ui_element == self.text_input:
-                        config.globalvars.identity = event.text 
-                        # TODO: Segment identify()
-                        retval = "WORLD"
+                        if is_valid_email(event.text):
+                            config.globalvars.identity = event.text 
+                            # TODO: Segment identify()
+                            retval = "WORLD"
             self.manager.process_events(event)
         self.manager.update(time_delta)
 
