@@ -1,6 +1,9 @@
 # Image foolishness
 .DS_Store
 
+# No environment files so there are no key leaks!
+config/env_vars.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
