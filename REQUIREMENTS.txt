@@ -1,3 +1,6 @@
-pygame
-pygame_gui
-pytmx
+protobuf==4.21.12
+pygame==2.5.0
+pygame-ce==2.3.1
+pygame-gui==0.6.9
+python-i18n==0.3.9
+PyTMX==3.32

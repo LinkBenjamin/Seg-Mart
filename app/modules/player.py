@@ -4,10 +4,12 @@ from app.utils.imports import import_folder
 from config.files import get_full_path
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, position, groups, obstacle_sprites, zones):
+    def __init__(self, position, groups, obstacle_sprites, zones, hotspots):
         super().__init__(groups)
         self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff_1.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft=position)
+
+        self.space_pressed = False
 
         # Animation Setup
         self.import_player_assets()
@@ -20,6 +22,7 @@ class Player(pygame.sprite.Sprite):
 
         self.obstacle_sprites = obstacle_sprites
         self.zones = zones
+        self.hotspots = hotspots
 
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0:
@@ -58,6 +61,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.direction.x = 0
 
+        # Object Interaction Controls
+        if keys[pygame.K_SPACE] and not self.space_pressed:
+            self.space_pressed = True
+            if len(config.globalvars.object_interaction) > 0:
+                config.globalvars.shopping_bag.append(config.globalvars.object_interaction)
+        if not keys[pygame.K_SPACE]:
+            self.space_pressed = False
+
     def move(self, speed):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
@@ -75,6 +86,13 @@ class Player(pygame.sprite.Sprite):
                 break
         if sprite.sprite_type not in config.globalvars.currentzone:
             config.globalvars.currentzone = ' '
+        
+        for sprite in self.hotspots:
+            if sprite.rect.colliderect(self.rect):
+                config.globalvars.object_interaction = sprite.sprite_type
+                break
+        if sprite.sprite_type not in config.globalvars.object_interaction:
+            config.globalvars.object_interaction = ' '
 
     def collision(self, direction):
         if direction == 'horizontal':
