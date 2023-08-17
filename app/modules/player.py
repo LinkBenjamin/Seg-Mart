@@ -1,5 +1,8 @@
 import sys, pygame
 import config.globalvars
+import segment.analytics as analytics
+
+from config.env_vars import SEGMENT_WRITE_KEY
 from app.utils.imports import import_folder
 from config.files import get_full_path
 
@@ -10,6 +13,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=position)
 
         self.space_pressed = False
+        analytics.write_key = SEGMENT_WRITE_KEY
 
         # Animation Setup
         self.import_player_assets()
@@ -66,6 +70,7 @@ class Player(pygame.sprite.Sprite):
             self.space_pressed = True
             if len(config.globalvars.object_interaction) > 0:
                 config.globalvars.shopping_bag.append(config.globalvars.object_interaction)
+                analytics.track(config.globalvars.identity,'Added item to cart', {'item_id':config.globalvars.object_interaction})
         if not keys[pygame.K_SPACE]:
             self.space_pressed = False
 
