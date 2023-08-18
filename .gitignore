@@ -1,6 +1,9 @@
 # Image foolishness
 .DS_Store
 
+# No environment vars!
+config/env_vars.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
