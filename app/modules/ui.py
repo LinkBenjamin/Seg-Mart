@@ -60,7 +60,17 @@ class UI:
         #Display the Shopping Bag
         sb_surf = self.font.render(self.bagsummary(), False, TEXT_COLOR)
         sb_rect = sb_surf.get_rect(topleft = (10, 70))
+        sb_clear_button = pygame.draw.rect(self.display_surface, 'light blue', [150, 70, 100,30], 0, 5)
+        sb_clear_text = self.font.render('Clear', True, 'black')
+        self.display_surface.blit(sb_clear_text, (155,75))
 
         pygame.draw.rect(self.display_surface, UI_BG_COLOR, sb_rect.inflate(10,10)) 
         self.display_surface.blit(sb_surf, sb_rect)
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, sb_rect.inflate(10,10),3)
+
+        if (sb_clear_button.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0] and not self.clicking):
+            self.clicking = True
+            config.globalvars.shopping_bag.clear()
+
+        if(not pygame.mouse.get_pressed()[0]):
+            self.clicking = False
