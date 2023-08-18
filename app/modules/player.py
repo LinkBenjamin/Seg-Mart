@@ -68,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         # Object Interaction Controls
         if keys[pygame.K_SPACE] and not self.space_pressed:
             self.space_pressed = True
-            if len(config.globalvars.object_interaction) > 0:
+            if config.globalvars.object_interaction != ' ':
                 config.globalvars.shopping_bag.append(config.globalvars.object_interaction)
                 analytics.track(config.globalvars.identity,'Added item to cart', {'item_id':config.globalvars.object_interaction})
         if not keys[pygame.K_SPACE]:
