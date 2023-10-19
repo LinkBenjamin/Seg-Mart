@@ -16,7 +16,7 @@ class TitleScreen:
         self.screen = screen
         self.background = pygame.image.load(get_full_path("static", "TitleScreen.png"))
         self.manager = pygame_gui.UIManager((1200,800))
-        self.text_input = UITextEntryLine(relative_rect=Rect(400,600,400,50), manager=self.manager)
+        self.text_input = UITextEntryLine(relative_rect=Rect(400,540,400,50), manager=self.manager)
         self.clock = pygame.time.Clock()
         analytics.write_key = SEGMENT_WRITE_KEY
         

@@ -9,7 +9,7 @@ from config.files import get_full_path
 class Player(pygame.sprite.Sprite):
     def __init__(self, position, groups, obstacle_sprites, zones, hotspots):
         super().__init__(groups)
-        self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff_1.png")).convert_alpha()
+        self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff-Front-Idle.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft=position)
 
         self.space_pressed = False
