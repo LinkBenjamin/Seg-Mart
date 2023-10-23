@@ -1,8 +1,5 @@
 import pygame
 import config.globalvars
-import segment.analytics as analytics
-
-from config.env_vars import SEGMENT_WRITE_KEY
 from config.files import get_full_path
 from config.constants import *
 from collections import Counter
@@ -15,7 +12,6 @@ class UI:
         self.font = pygame.font.Font(get_full_path("static", "TwilioSansMono-Regular.otf"),UI_FONT_SIZE)
 
         self.identity_rect = pygame.Rect(10,10,150,40)
-        analytics.write_key = SEGMENT_WRITE_KEY
         self.clicking = False
 
     def bagsummary(self):
