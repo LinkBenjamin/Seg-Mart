@@ -66,8 +66,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and not self.space_pressed:
             self.space_pressed = True
             if config.globalvars.object_interaction != ' ':
-                print(config.globalvars.object_interaction)
-                if config.globalvars.object_interaction == 'checkout':
+                if config.globalvars.object_interaction == '19':
                     #do checkout-y things
                     config.globalvars.shopping_bag.clear()
                 else:

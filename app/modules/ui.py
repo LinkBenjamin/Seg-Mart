@@ -24,15 +24,15 @@ class UI:
             nameStr = ' '
 
             if item != ' ':
-                if int(item) == 15:
+                if int(item) == 18:
                     nameStr = "Motor Oil: "
-                elif int(item) == 16:
-                    nameStr = "Plant   : "
-                elif int(item) == 17:
-                    nameStr = "Laptop   : "
-                elif int(item) == 18:
-                    nameStr = "Drink    : "
                 elif int(item) == 23:
+                    nameStr = "Plant    : "
+                elif int(item) == 20:
+                    nameStr = "Laptop   : "
+                elif int(item) == 21:
+                    nameStr = "Drink    : "
+                elif int(item) == 22:
                     nameStr = "Shoes    : "
 
             retval += nameStr
