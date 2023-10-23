@@ -1,5 +1,8 @@
 import pygame
 import config.globalvars
+import segment.analytics as analytics
+
+from config.env_vars import SEGMENT_WRITE_KEY
 from config.files import get_full_path
 from config.constants import *
 from collections import Counter
@@ -12,6 +15,8 @@ class UI:
         self.font = pygame.font.Font(get_full_path("static", "TwilioSansMono-Regular.otf"),UI_FONT_SIZE)
 
         self.identity_rect = pygame.Rect(10,10,150,40)
+        analytics.write_key = SEGMENT_WRITE_KEY
+        self.clicking = False
 
     def bagsummary(self):
         retval =  "Shopping Bag\n"
@@ -21,16 +26,18 @@ class UI:
         sorted_items = sorted(item_count.items(), key=lambda x:x[0])
         for item, count in sorted_items:
             nameStr = ' '
-            if int(item) == 18:
-                nameStr = "Motor Oil: "
-            elif int(item) == 21:
-                nameStr = "Flower   : "
-            elif int(item) == 22:
-                nameStr = "Laptop   : "
-            elif int(item) == 19:
-                nameStr = "Drink    : "
-            elif int(item) == 20:
-                nameStr = "Shoes    : "
+
+            if item != ' ':
+                if int(item) == 18:
+                    nameStr = "Motor Oil: "
+                elif int(item) == 21:
+                    nameStr = "Flower   : "
+                elif int(item) == 22:
+                    nameStr = "Laptop   : "
+                elif int(item) == 19:
+                    nameStr = "Drink    : "
+                elif int(item) == 20:
+                    nameStr = "Shoes    : "
 
             retval += nameStr
             retval += str(count)
@@ -70,6 +77,7 @@ class UI:
 
         if (sb_clear_button.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0] and not self.clicking):
             self.clicking = True
+
             config.globalvars.shopping_bag.clear()
 
         if(not pygame.mouse.get_pressed()[0]):
