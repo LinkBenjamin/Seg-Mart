@@ -77,7 +77,7 @@ class UI:
 
         if (sb_clear_button.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0] and not self.clicking):
             self.clicking = True
-            analytics.track(config.globalvars.identity, "Cleared Shopping Cart")
+
             config.globalvars.shopping_bag.clear()
 
         if(not pygame.mouse.get_pressed()[0]):

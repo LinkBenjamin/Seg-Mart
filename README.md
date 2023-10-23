@@ -9,3 +9,6 @@ Install your dependencies with
 Then you can run it with
 
 `python main.py`
+
+# Using Seg-Mart in a Demo
+See [DEMOING.md](DEMOING.md).
