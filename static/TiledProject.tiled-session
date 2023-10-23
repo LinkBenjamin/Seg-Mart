@@ -5,22 +5,24 @@
     },
     "activeFile": "Map.tmx",
     "expandedProjectPaths": [
+        "."
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "GroundTiles.tsx": {
             "scaleInDock": 0.75,
             "scaleInEditor": 1
         },
         "Map.tmx": {
-            "scale": 0.29885416666666664,
-            "selectedLayer": 2,
+            "scale": 0.63,
+            "selectedLayer": 4,
             "viewCenter": {
-                "x": 167.30568142209836,
-                "y": 890.066225165563
+                "x": 613.4920634920635,
+                "y": 738.8888888888888
             }
         }
     },
-    "last.exportedFilePath": "/Users/ben/Documents/Seg-Mart/static",
+    "last.exportedFilePath": "/Users/blink/Documents/Seg-Mart/static",
     "last.imagePath": "/Users/ben/Documents/Seg-Mart/static",
     "map.height": 30,
     "map.lastUsedExportFilter": "CSV files (*.csv)",
@@ -29,13 +31,12 @@
     "map.tileWidth": 64,
     "map.width": 30,
     "openFiles": [
-        "GroundTiles.tsx",
         "Map.tmx"
     ],
     "project": "TiledProject.tiled-project",
     "recentFiles": [
-        "GroundTiles.tsx",
-        "Map.tmx"
+        "Map.tmx",
+        "GroundTiles.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
