@@ -28,10 +28,10 @@ This is why Segment is important.  Let's implement it with our store...
 * Create a file in /config/ called `env_vars.py`
 * In the file, make a variable `SEGMENT_WRITE_KEY = xxxxxx`, replacing the x's with the write key from your Python Segment Source.
 * Save it, don't open the file during the demo so you don't leak your key!
+* This file is already .gitignore'd so you don't run the risk of pushing it into the repo if you save any changes.
 
 ### Demo Steps
-1. In our store, you provide your email address to enter.  Think of this as your website's "login" page... after which the user is identified.
-1. We're going to inject Segment first into this process, because it's important that we establish the identity of a visitor.
+In our store, you provide your email address to enter.  Think of this as your website's "login" page... after which the user is identified. We're going to inject Segment first into this process, because it's important that we establish the identity of a visitor.
 
 Go to `app/views/` and look for `title_screen.py`.
 1. Add `import segment.analytics as analytics` at the top of the file.
@@ -39,23 +39,29 @@ Go to `app/views/` and look for `title_screen.py`.
 1. In the `__init__` method, add a line to establish the write key: `analytics.write_key = SEGMENT_WRITE_KEY`
 1. Look down where the identity is established (about line 38), and add your Segment identify() call: `analytics.identify(config.globalvars.identity)`
 
+Next we're going to capture the event when the player adds an item to the shopping bag:
+
 Go to `app/modules/` and look for `player.py`.
 1. Add `import segment.analytics as analytics` at the top of the file.
 1. Just below it, add `from config.env_vars.py import SEGMENT_WRITE_KEY`
 1. In the `__init__` method, add a line to establish the write key: `analytics.write_key = SEGMENT_WRITE_KEY`
-1. Look for the "Object interaction controls" - you'll add a track() on line 73-ish:  `analytics.track(config.globalvars.identity, 'Added Item to Cart', {'item_id': config.globalvars.object_interaction})`
+1. Look for the "Object interaction controls" - you'll add a track() on line 73-ish:  `analytics.track(config.globalvars.identity, 'Added Item to Shopping Bag', {'item_id': config.globalvars.object_interaction})`
+
+It would be really cool to also capture if he's checked out.  Just above where we added the previous track event, we can put this in checkout:
+1. `analytics.track(config.globalvars.identity, 'Checkout', {'bag':config.global_vars.shopping_bag})`
+
+Now we want to know when a cart gets cleared.  
 
 Go to `app/modules` and look for `ui.py`.
 1. Add `import segment.analytics as analytics` at the top of the file.
 1. Just below it, add `from config.env_vars.py import SEGMENT_WRITE_KEY`
 1. In the `__init__` method, add a line to establish the write key: `analytics.write_key = SEGMENT_WRITE_KEY`
-1. Look for the shopping_bag.clear() call around line 80.  You'll add a track() right next to this: `analytics.track(config.globalvars.identity, 'Cleared Shopping Cart')`
+1. Look for the shopping_bag.clear() call around line 80.  You'll add a track() right next to this: `analytics.track(config.globalvars.identity, 'Cleared Shopping Cart', {'location':config.global_vars.currentzone})`
 
 Now let's revisit Jeff wandering around our store.  (Restart the application, but also have the Segment debugger up on the screen too).  As Jeff adds various items to his bag, or maybe clears the cart out... Segment gathers those events so that we know what Jeff's up to.
 
 Imagine we had more time to implement - what other events would we want to track?  Maybe when Jeff...
 * enters various sections of the store
-* checks out
 * uses a coupon
 * uses an in-store ATM
 * puts items on his Wish List
