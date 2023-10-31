@@ -60,7 +60,7 @@ class World:
                             image = pygame.image.load(get_full_path("static", "objects", col + ".png"))
                             Tile((col_index*TILESIZE, row_index*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
 
-        self.player = Player((320,192), [self.visible_sprites], self.obstacle_sprites, self.zones, self.hotspots)
+        self.player = Player((320,64), [self.visible_sprites], self.obstacle_sprites, self.zones, self.hotspots)
 
     def loadidentity(self,identity):
         self.identity = identity
