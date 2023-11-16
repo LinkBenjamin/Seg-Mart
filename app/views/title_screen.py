@@ -22,13 +22,19 @@ class TitleScreen:
         retval = "TITLE_SCREEN"
         time_delta = self.clock.tick(60)/1000.0
         for event in pygame.event.get():
+            #  If the user presses q or ESC, we want to quit the game.
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                     retval = "QUIT"
                     break
+
+            #  Otherwise, we just want to wait until they've finished entering their text
+            #  We detect this as an enter key press.
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_TEXT_ENTRY_FINISHED:
                     if event.ui_element == self.text_input:
+                        #  If the user's email is valid, we can now consider this their identity
+                        #  and allow them into the world.
                         if is_valid_email(event.text):
                             config.globalvars.identity = event.text 
                             retval = "WORLD"
