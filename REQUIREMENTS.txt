@@ -13,4 +13,4 @@ PyTMX==3.32
 requests==2.31.0
 segment-analytics-python==2.2.3
 six==1.16.0
-urllib3==2.0.4
+urllib3>=2.0.7
