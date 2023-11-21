@@ -20,20 +20,10 @@ class UI:
         
         item_count = Counter(config.globalvars.shopping_bag)
         sorted_items = sorted(item_count.items(), key=lambda x:x[0])
+        
         for item, count in sorted_items:
-            nameStr = ' '
-
-            if item != ' ':
-                if int(item) == 18:
-                    nameStr = "Motor Oil: "
-                elif int(item) == 23:
-                    nameStr = "Plant    : "
-                elif int(item) == 20:
-                    nameStr = "Laptop   : "
-                elif int(item) == 21:
-                    nameStr = "Drink    : "
-                elif int(item) == 22:
-                    nameStr = "Shoes    : "
+    
+            nameStr = config.globalvars.game_items[item][3] + ": "
 
             retval += nameStr
             retval += str(count)
@@ -51,14 +41,17 @@ class UI:
         self.display_surface.blit(id_surf, id_rect)
         pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, id_rect.inflate(10,10),3)
 
-        #Display the current zone box
-        zn_surf = self.font.render("Currently in " + config.globalvars.currentzone,False,TEXT_COLOR)
-        zn_rect = zn_surf.get_rect(topleft = (10,40))
-
-        #if len(config.globalvars.currentzone) == 0:
-        pygame.draw.rect(self.display_surface, UI_BG_COLOR, zn_rect.inflate(10,10)) 
-        self.display_surface.blit(zn_surf, zn_rect)
-        pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, zn_rect.inflate(10,10),3)
+        # Display the interaction notification, if there is one
+        if ' ' not in config.globalvars.object_interaction:
+            if config.globalvars.object_interaction == 't':
+                zn_surf = self.font.render("Press [space] to check out.",False,TEXT_COLOR)
+            else:
+                zn_surf = self.font.render("Press [space] to add a " + config.globalvars.game_items[config.globalvars.object_interaction][3] + " to your shopping bag.",False,TEXT_COLOR)
+            
+            zn_rect = zn_surf.get_rect(topleft = (10,40))
+            pygame.draw.rect(self.display_surface, UI_BG_COLOR, zn_rect.inflate(10,10)) 
+            self.display_surface.blit(zn_surf, zn_rect)
+            pygame.draw.rect(self.display_surface, UI_BORDER_COLOR, zn_rect.inflate(10,10),3)
 
         #Display the Shopping Bag
         sb_surf = self.font.render(self.bagsummary(), False, TEXT_COLOR)

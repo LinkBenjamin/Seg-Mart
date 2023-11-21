@@ -1,14 +1,18 @@
 import pygame
-from pytmx.util_pygame import load_pygame
-from app.utils.imports import import_csv_layout
 
-from config.tempMap import WORLD_MAP
+from config.retailstore import *
 from config.files import get_full_path
+from config.globalvars import *
 from config.constants import *
 from app.modules.tile import Tile
 from app.modules.player import Player
 from app.modules.ui import UI
 
+# This class creates the world and places the player in it.
+# Currently there's only one world: 'retail store'.  But in the future
+# all that would be necessary is to create a new .py file in /config that
+# contains the arrays of items, and a .png file with the floor map on it
+# to place behind the character, and you could add multiple worlds.
 class World:
     def __init__(self):
 
@@ -18,8 +22,7 @@ class World:
         # Create sprite groups
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
-        self.zones = pygame.sprite.Group()
-        self.hotspots = pygame.sprite.Group()
+        self.items = pygame.sprite.Group()
 
         self.create_map()
 
@@ -27,40 +30,30 @@ class World:
         self.ui = UI()
 
     def create_map(self):
-        tmx_data = load_pygame(get_full_path("static", "Map.tmx"))
-        layouts = {
-            'boundary': tmx_data.get_layer_by_name('Barriers'),
-            'zones': tmx_data.get_layer_by_name('Zones'),
-            'hotspots': tmx_data.get_layer_by_name('Hotspots')
-        }
-        csvlayouts = {
-            'objects': import_csv_layout(get_full_path("static", "Map_Objects.csv")),
-            'interactables': import_csv_layout(get_full_path("static","Map_Interactables.csv"))
-        }
+        # Load (BARRIERS) - if anything is not blank, it's a barrier and we should load an obstacle tile
+        for i in range(len(BARRIERS)):
+            for j in range(len(BARRIERS[i])):
+                if 'b' in BARRIERS[i][j]:
+                    Tile((j * TILESIZE,i * TILESIZE),0,[self.obstacle_sprites],"barrier")
 
-        # Map the zones (departments of the store)
-        for obj in layouts['zones']:
-            Tile((obj.x, obj.y), [self.zones], obj.name, pygame.Surface((obj.width, obj.height)))
+        # Load (DECORATIONS) - if anything is not blank, add it as an obstacle
+        for i in range(len(DECORATIONS)):
+            for j in range(len(DECORATIONS[i])):
+                val = str(DECORATIONS[i][j])
+                if not ' ' in val:
+                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
+                    Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.obstacle_sprites],game_items[val][2],image)
 
-        # Map the hotspots (if the user presses interact while overlapping a hotspot they'll add the item to their "shopping bag")
-        for x,y,s in layouts['hotspots']:
-            if(s != 0):
-                Tile((x * TILESIZE, y * TILESIZE), [self.hotspots], str(s))
+        # Load (ITEMS) - if anything is not blank, add it as interactable.
+        for i in range(len(ITEMS)):
+            for j in range(len(ITEMS[i])):
+                val = str(ITEMS[i][j])
+                if not ' ' in val:
+                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
+                    Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
 
-        # Build a series of invisible obstacle tiles based on the boundary layer - handles all the walls
-        for x,y,s in layouts['boundary']:
-            if(s != 0):
-                Tile((x * TILESIZE,y * TILESIZE),[self.obstacle_sprites],"barrier")
-
-        # Build the objects that appear in the game.
-        for style, layout in csvlayouts.items():
-                for row_index, row in enumerate(layout):
-                    for col_index, col in enumerate(row):
-                        if int(col) > 0:
-                            image = pygame.image.load(get_full_path("static", "objects", col + ".png"))
-                            Tile((col_index*TILESIZE, row_index*TILESIZE), [self.visible_sprites, self.obstacle_sprites], "object", image)
-
-        self.player = Player((320,64), [self.visible_sprites], self.obstacle_sprites, self.zones, self.hotspots)
+        # Load the player in the starting location.
+        self.player = Player((320,256), -10, [self.visible_sprites], self.obstacle_sprites, self.items)
 
     def loadidentity(self,identity):
         self.identity = identity
@@ -71,6 +64,8 @@ class World:
         self.visible_sprites.update()
         self.ui.display(self.player)
 
+# This Camera object detaches the viewscreen from the fixed position on the grid and
+# allows us to track the player as they walk around the map.
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
@@ -80,9 +75,12 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2()
 
         # Create the floor
-        self.floor_surf = pygame.image.load(get_full_path("static", "Map.png")).convert()
+        self.floor_surf = pygame.image.load(get_full_path("static", BACKGROUND)).convert()
         self.floor_rect = self.floor_surf.get_rect(topleft = (0,0))
 
+# custom_draw ensures that the camera tracks the player and ensures that the objects
+# are stacked appropriately so that things "lower" on the grid appear in perspective relative
+# to the viewer.
     def custom_draw(self, player):
         # Getting player offset for the camera
         self.offset.x = player.rect.centerx - self.half_width

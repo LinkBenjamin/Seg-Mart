@@ -5,11 +5,12 @@ from app.utils.imports import import_folder
 from config.files import get_full_path
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, position, groups, obstacle_sprites, zones, hotspots):
+    def __init__(self, position, hitboxinflate, groups, obstacle_sprites, items):
         super().__init__(groups)
         self.image = pygame.image.load(get_full_path("static", "Jeff", "down_idle", "Jeff-Front-Idle.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft=position)
-
+        self.hitbox = self.rect.inflate(hitboxinflate,hitboxinflate)
+        
         self.space_pressed = False
 
         # Animation Setup
@@ -22,8 +23,9 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
 
         self.obstacle_sprites = obstacle_sprites
-        self.zones = zones
-        self.hotspots = hotspots
+        self.items = items
+
+        self.touching_item = ' '
 
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0:
@@ -66,7 +68,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and not self.space_pressed:
             self.space_pressed = True
             if config.globalvars.object_interaction != ' ':
-                if config.globalvars.object_interaction == '19':
+                if config.globalvars.object_interaction == 't':
                     #do checkout-y things
                     config.globalvars.shopping_bag.clear()
                 else:
@@ -79,44 +81,39 @@ class Player(pygame.sprite.Sprite):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
 
-        self.rect.x += self.direction.x * speed
+        self.hitbox.x += self.direction.x * speed
         self.collision('horizontal')
-        self.rect.y += self.direction.y * speed
+        self.hitbox.y += self.direction.y * speed
         self.collision('vertical')
+        self.rect.center = self.hitbox.center
         self.touch()
+        config.globalvars.object_interaction = self.touching_item
 
     def touch(self):
-        for sprite in self.zones:
-            if sprite.rect.colliderect(self.rect):
-                config.globalvars.currentzone = sprite.sprite_type
+        for sprite in self.items:
+            if sprite.hitbox.colliderect(self.hitbox):
+                self.touching_item = sprite.sprite_type
                 break
-        if sprite.sprite_type not in config.globalvars.currentzone:
-            config.globalvars.currentzone = ' '
-        
-        for sprite in self.hotspots:
-            if sprite.rect.colliderect(self.rect):
-                config.globalvars.object_interaction = sprite.sprite_type
-                break
-        if sprite.sprite_type not in config.globalvars.object_interaction:
-            config.globalvars.object_interaction = ' '
+            if sprite.sprite_type not in self.touching_item:
+                self.touching_item = ' '
 
     def collision(self, direction):
         if direction == 'horizontal':
             for sprite in self.obstacle_sprites:
-                if sprite.rect.colliderect(self.rect):
+                if sprite.hitbox.colliderect(self.hitbox):
                     if self.direction.x > 0:
-                        self.rect.right = sprite.rect.left
+                        self.hitbox.right = sprite.hitbox.left
                     else:
-                        self.rect.left = sprite.rect.right
+                        self.hitbox.left = sprite.hitbox.right
                     
 
         if direction == 'vertical':
             for sprite in self.obstacle_sprites:
-                if sprite.rect.colliderect(self.rect):
+                if sprite.hitbox.colliderect(self.hitbox):
                     if self.direction.y > 0:
-                        self.rect.bottom = sprite.rect.top
+                        self.hitbox.bottom = sprite.hitbox.top
                     else:
-                        self.rect.top = sprite.rect.bottom
+                        self.hitbox.top = sprite.hitbox.bottom
 
     def animate(self):
         animation = self.animations[self.status]
@@ -125,7 +122,7 @@ class Player(pygame.sprite.Sprite):
             self.frame_index = 0
         
         self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.rect.center)
+        self.hitbox = self.image.get_rect(center = self.hitbox.center)
 
     def update(self):
         self.input()
