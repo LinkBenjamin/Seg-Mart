@@ -1,5 +1,7 @@
 import pygame
 import config.globalvars
+import segment.analytics as analytics
+
 from config.files import get_full_path
 from config.constants import *
 from collections import Counter

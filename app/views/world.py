@@ -1,4 +1,5 @@
 import pygame
+import segment.analytics as analytics
 
 from config.retailstore import *
 from config.files import get_full_path

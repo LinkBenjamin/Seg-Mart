@@ -1,5 +1,6 @@
 import sys, pygame
 import config.globalvars
+import segment.analytics as analytics
 
 from app.utils.imports import import_folder
 from config.files import get_full_path
