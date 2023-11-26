@@ -22,9 +22,9 @@ class TitleScreen:
         retval = "TITLE_SCREEN"
         time_delta = self.clock.tick(60)/1000.0
         for event in pygame.event.get():
-            #  If the user presses q or ESC, we want to quit the game.
+            #  If the user presses ESC, we want to quit the game.
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE:
                     retval = "QUIT"
                     break
 

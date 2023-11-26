@@ -1,6 +1,9 @@
 import pygame
-import segment.analytics as analytics
+import segment_public_api
 
+from config.env_vars import *
+from segment_public_api.rest import ApiException
+from segment_public_api.models.get_computed_trait200_response import GetComputedTrait200Response
 from config.retailstore import *
 from config.files import get_full_path
 from config.globalvars import *
@@ -8,6 +11,7 @@ from config.constants import *
 from app.modules.tile import Tile
 from app.modules.player import Player
 from app.modules.ui import UI
+from pprint import pprint
 
 # This class creates the world and places the player in it.
 # Currently there's only one world: 'retail store'.  But in the future
@@ -17,6 +21,10 @@ from app.modules.ui import UI
 class World:
     def __init__(self):
 
+        self.segment_config = segment_public_api.Configuration(
+            access_token= SEGMENT_API_TOKEN
+        )
+
         # Get the display surface
         self.display_surface = pygame.display.get_surface()
 
@@ -25,12 +33,16 @@ class World:
         self.obstacle_sprites = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
 
-        self.create_map()
+        self.worldrunning = False
 
         # UI
         self.ui = UI()
 
     def create_map(self):
+        # Start by checking to see if there's a Segment profile for this person.  If there is, we're gonna need to 
+        # put their preferred item as an impulse buy
+        self.impulse_item = self.getfromSegmentprofile()
+
         # Load (BARRIERS) - if anything is not blank, it's a barrier and we should load an obstacle tile
         for i in range(len(BARRIERS)):
             for j in range(len(BARRIERS[i])):
@@ -49,9 +61,13 @@ class World:
         for i in range(len(ITEMS)):
             for j in range(len(ITEMS[i])):
                 val = str(ITEMS[i][j])
-                if not ' ' in val:
-                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
-                    Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
+                if '0' in val:
+                    # This is an impulse-buy item, populated from the Segment profile.  If it's not populated, leave it blank.
+                    pass
+                else:
+                    if not ' ' in val:
+                        image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
+                        Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
 
         # Load the player in the starting location.
         self.player = Player((320,256), -10, [self.visible_sprites], self.obstacle_sprites, self.items)
@@ -60,10 +76,27 @@ class World:
         self.identity = identity
 
     def run(self):
+
+        if not self.worldrunning:
+            self.create_map()
+            self.worldrunning = True
+            
         #Update and draw
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         self.ui.display(self.player)
+
+    def getfromSegmentprofile(self):
+        with segment_public_api.ApiClient(configuration=self.segment_config) as api_client:
+            api_instance = segment_public_api.ComputedTraitsApi(api_client)
+            space_id = SEGMENT_SPACE_ID
+
+            try:
+                api_response = api_instance.get_computed_trait(space_id,identity)
+                print('Response = \n')
+                pprint(api_response)
+            except Exception as e:
+                print("Exception when calling ComputedTraitsApi->get_computed_trait: %s\n" % e)
 
 # This Camera object detaches the viewscreen from the fixed position on the grid and
 # allows us to track the player as they walk around the map.
