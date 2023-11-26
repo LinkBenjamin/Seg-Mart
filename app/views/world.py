@@ -80,7 +80,7 @@ class World:
         if not self.worldrunning:
             self.create_map()
             self.worldrunning = True
-            
+
         #Update and draw
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
@@ -90,13 +90,15 @@ class World:
         with segment_public_api.ApiClient(configuration=self.segment_config) as api_client:
             api_instance = segment_public_api.ComputedTraitsApi(api_client)
             space_id = SEGMENT_SPACE_ID
+            pagination = segment_public_api.PaginationInput(count=100)
 
             try:
-                api_response = api_instance.get_computed_trait(space_id,identity)
+                api_response = api_instance.list_computed_traits(space_id,pagination)
+
                 print('Response = \n')
                 pprint(api_response)
             except Exception as e:
-                print("Exception when calling ComputedTraitsApi->get_computed_trait: %s\n" % e)
+                print("Exception when calling ComputedTraitsApi->list_computed_traits: %s\n" % e)
 
 # This Camera object detaches the viewscreen from the fixed position on the grid and
 # allows us to track the player as they walk around the map.
