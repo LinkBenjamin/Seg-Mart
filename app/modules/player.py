@@ -2,6 +2,7 @@ import sys, pygame
 import config.globalvars
 import segment.analytics as analytics
 
+from config.env_vars import *
 from app.utils.imports import import_folder
 from config.files import get_full_path
 
@@ -70,7 +71,7 @@ class Player(pygame.sprite.Sprite):
             self.space_pressed = True
             if config.globalvars.object_interaction != ' ':
                 if config.globalvars.object_interaction == 't':
-                    #do checkout-y things
+                    #do checkout things
                     config.globalvars.shopping_bag.clear()
                 else:
                     #put item in shopping bag

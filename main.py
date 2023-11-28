@@ -1,4 +1,5 @@
 import pygame, sys
+import config.globalvars
 
 from config.constants import *
 from app.views.title_screen import TitleScreen
@@ -28,6 +29,8 @@ class Game:
                         if event.type == pygame.QUIT:
                             self.gamestate = "QUIT"
                     self.screen.fill('black')
+                    config.globalvars.identity = self.titlescreen.get_identity()
+
                     self.world.run()
                     pygame.display.update()
                     self.clock.tick(FPS)

@@ -1,7 +1,9 @@
 import pygame
 import pygame_gui
 import config.globalvars
+import segment.analytics as analytics
 
+from config.env_vars import *
 from pygame.rect import Rect
 from pygame_gui.elements.ui_text_entry_line import UITextEntryLine
 from config.files import get_full_path
@@ -16,6 +18,7 @@ class TitleScreen:
         self.manager = pygame_gui.UIManager((1200,800))
         self.text_input = UITextEntryLine(relative_rect=Rect(400,540,400,50), manager=self.manager)
         self.clock = pygame.time.Clock()
+        self.identity = 'nobody'
         
     
     def handle_events(self):
@@ -36,12 +39,15 @@ class TitleScreen:
                         #  If the user's email is valid, we can now consider this their identity
                         #  and allow them into the world.
                         if is_valid_email(event.text):
-                            config.globalvars.identity = event.text 
+                            self.identity = event.text 
                             retval = "WORLD"
             self.manager.process_events(event)
         self.manager.update(time_delta)
 
         return retval
+    
+    def get_identity(self):
+        return self.identity
 
     def render(self):
         self.screen.blit(self.background, (0,0))

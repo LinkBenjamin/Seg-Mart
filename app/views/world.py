@@ -1,17 +1,13 @@
-import pygame
-import segment_public_api
+import pygame, requests, config.globalvars, base64
 
+from config.globalvars import game_items
 from config.env_vars import *
-from segment_public_api.rest import ApiException
-from segment_public_api.models.get_computed_trait200_response import GetComputedTrait200Response
 from config.retailstore import *
 from config.files import get_full_path
-from config.globalvars import *
 from config.constants import *
 from app.modules.tile import Tile
 from app.modules.player import Player
 from app.modules.ui import UI
-from pprint import pprint
 
 # This class creates the world and places the player in it.
 # Currently there's only one world: 'retail store'.  But in the future
@@ -21,10 +17,6 @@ from pprint import pprint
 class World:
     def __init__(self):
 
-        self.segment_config = segment_public_api.Configuration(
-            access_token= SEGMENT_API_TOKEN
-        )
-
         # Get the display surface
         self.display_surface = pygame.display.get_surface()
 
@@ -33,6 +25,7 @@ class World:
         self.obstacle_sprites = pygame.sprite.Group()
         self.items = pygame.sprite.Group()
 
+        self.impulse_item = 'q'
         self.worldrunning = False
 
         # UI
@@ -41,7 +34,8 @@ class World:
     def create_map(self):
         # Start by checking to see if there's a Segment profile for this person.  If there is, we're gonna need to 
         # put their preferred item as an impulse buy
-        self.impulse_item = self.getfromSegmentprofile()
+        if 'nobody' not in config.globalvars.identity:
+            self.impulse_item = self.getfromSegmentprofile()
 
         # Load (BARRIERS) - if anything is not blank, it's a barrier and we should load an obstacle tile
         for i in range(len(BARRIERS)):
@@ -62,12 +56,12 @@ class World:
             for j in range(len(ITEMS[i])):
                 val = str(ITEMS[i][j])
                 if '0' in val:
-                    # This is an impulse-buy item, populated from the Segment profile.  If it's not populated, leave it blank.
-                    pass
-                else:
-                    if not ' ' in val:
-                        image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
-                        Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
+                    # This is an impulse-buy item, populated from the Segment profile.  
+                    val = self.impulse_item
+            
+                if not ' ' in val:
+                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
+                    Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
 
         # Load the player in the starting location.
         self.player = Player((320,256), -10, [self.visible_sprites], self.obstacle_sprites, self.items)
@@ -76,30 +70,41 @@ class World:
         self.identity = identity
 
     def run(self):
-
-        if not self.worldrunning:
-            self.create_map()
-            self.worldrunning = True
-
-        #Update and draw
-        self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
-        self.ui.display(self.player)
+        if self.worldrunning:
+            #Update and draw
+            self.visible_sprites.custom_draw(self.player)
+            self.visible_sprites.update()
+            self.ui.display(self.player)
+        else:
+            if 'nobody' not in config.globalvars.identity:
+                self.worldrunning = True
+                self.create_map()
 
     def getfromSegmentprofile(self):
-        with segment_public_api.ApiClient(configuration=self.segment_config) as api_client:
-            api_instance = segment_public_api.ComputedTraitsApi(api_client)
-            space_id = SEGMENT_SPACE_ID
-            pagination = segment_public_api.PaginationInput(count=100)
+        # 1 - get profile, find the trait we want (impulse_suggestion)
+        # 1a - if the profile doesn't exist, return 'shoes'
+        # 2 - this value can be 1-5. 1 = motor oil, 2 = laptop, 3 = shoes, 4 = plant, 5 = drink
+        # 3 - return the associated letter code. 1 = o, 2 = q, 3 = v, 4 = p, 5 = r
+        token_string = SEGMENT_API_TOKEN + ':'
 
-            try:
-                api_response = api_instance.list_computed_traits(space_id,pagination)
+        my_headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + str(base64.b64encode(token_string.encode("ascii"))),
+            }
+        req = SEGMENT_ENDPOINT.replace("<external_id>","user_id:"+ config.globalvars.identity)
+        resp = requests.get(req,headers=my_headers)
+        
+        # if the profile doesn't have the trait, return shoes.
+        rval = self.impulse_item
+        if '[404]' in str(resp):
+            print(req)
+            print(resp)
+        else:
+            # figure out which is the preferred object and return that
+            print(resp)
+            pass
 
-                print('Response = \n')
-                pprint(api_response)
-            except Exception as e:
-                print("Exception when calling ComputedTraitsApi->list_computed_traits: %s\n" % e)
-
+        return rval
 # This Camera object detaches the viewscreen from the fixed position on the grid and
 # allows us to track the player as they walk around the map.
 class YSortCameraGroup(pygame.sprite.Group):
