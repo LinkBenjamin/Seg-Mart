@@ -1,4 +1,4 @@
-import pygame, requests, config.globalvars, base64
+import pygame, requests, config.globalvars, base64, json
 
 from config.globalvars import game_items
 from config.env_vars import *
@@ -32,10 +32,6 @@ class World:
         self.ui = UI()
 
     def create_map(self):
-        # Start by checking to see if there's a Segment profile for this person.  If there is, we're gonna need to 
-        # put their preferred item as an impulse buy
-        if 'nobody' not in config.globalvars.identity:
-            self.impulse_item = self.getfromSegmentprofile()
 
         # Load (BARRIERS) - if anything is not blank, it's a barrier and we should load an obstacle tile
         for i in range(len(BARRIERS)):
@@ -57,11 +53,13 @@ class World:
                 val = str(ITEMS[i][j])
                 if '0' in val:
                     # This is an impulse-buy item, populated from the Segment profile.  
-                    val = self.impulse_item
+                    v = self.getfromSegmentprofile()
+                else:
+                    v = val
             
-                if not ' ' in val:
-                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[val][0]) + ".png"))
-                    Tile((j*TILESIZE, i*TILESIZE),game_items[val][1],[self.visible_sprites, self.items],val,image)
+                if not ' ' in v:
+                    image = pygame.image.load(get_full_path("static", "objects", str(game_items[v][0]) + ".png"))
+                    Tile((j*TILESIZE, i*TILESIZE),game_items[v][1],[self.visible_sprites, self.items],v,image)
 
         # Load the player in the starting location.
         self.player = Player((320,256), -10, [self.visible_sprites], self.obstacle_sprites, self.items)
@@ -86,24 +84,36 @@ class World:
         # 2 - this value can be 1-5. 1 = motor oil, 2 = laptop, 3 = shoes, 4 = plant, 5 = drink
         # 3 - return the associated letter code. 1 = o, 2 = q, 3 = v, 4 = p, 5 = r
         token_string = SEGMENT_API_TOKEN + ':'
-
         my_headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + str(base64.b64encode(token_string.encode("ascii"))),
+            'Authorization': 'Basic ' + base64.b64encode(f"{SEGMENT_API_TOKEN}:".encode()).decode(),
             }
         req = SEGMENT_ENDPOINT.replace("<external_id>","user_id:"+ config.globalvars.identity)
         resp = requests.get(req,headers=my_headers)
         
         # if the profile doesn't have the trait, return shoes.
-        rval = self.impulse_item
+        
         if '[404]' in str(resp):
-            print(req)
-            print(resp)
+            rval = self.impulse_item
         else:
             # figure out which is the preferred object and return that
-            print(resp)
-            pass
-
+            print(req)
+            x = json.loads(resp.content)
+            print(x)
+            print(x['traits']['impulse_buy'])
+            match str(x['traits']['impulse_buy']):
+                case '1':
+                    return 'o'
+                case '2':
+                    return 'q'
+                case '3':
+                    return 'v'
+                case '4':
+                    return 'p'
+                case '5':
+                    return 'r'
+                case _:
+                    return 'r'
         return rval
 # This Camera object detaches the viewscreen from the fixed position on the grid and
 # allows us to track the player as they walk around the map.
