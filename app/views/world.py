@@ -97,23 +97,30 @@ class World:
             rval = self.impulse_item
         else:
             # figure out which is the preferred object and return that
-            print(req)
-            x = json.loads(resp.content)
-            print(x)
-            print(x['traits']['impulse_buy'])
-            match str(x['traits']['impulse_buy']):
-                case '1':
-                    return 'o'
-                case '2':
-                    return 'q'
-                case '3':
-                    return 'v'
-                case '4':
-                    return 'p'
-                case '5':
-                    return 'r'
-                case _:
-                    return 'r'
+            if 'impulse_buy' in str(resp.content):
+                # We got a response with 'impulse_buy' as an element.
+                # This means that the profile exists and contains the
+                # computed trait.
+                x = json.loads(resp.content)
+                print(x['traits']['impulse_buy'])
+                match str(x['traits']['impulse_buy']):
+                    case '1':
+                        return 'o'
+                    case '2':
+                        return 'q'
+                    case '3':
+                        return 'v'
+                    case '4':
+                        return 'p'
+                    case '5':
+                        return 'r'
+                    case _:
+                        return 'r'
+            else:
+                # We didn't get a response with 'impulse_buy' as an element.
+                # So either the profile doesn't exist, or it doesn't have the trait.
+                # In this case, we put a default item on the impulse-buy shelf.
+                return self.impulse_item
         return rval
 # This Camera object detaches the viewscreen from the fixed position on the grid and
 # allows us to track the player as they walk around the map.
